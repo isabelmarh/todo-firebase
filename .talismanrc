@@ -1,6 +1,6 @@
 fileignoreconfig:
 - filename: package-lock.json
-  checksum: 7dc264aa2e1b9fc21bb7f63ce9cf1b0be026a7c81c6d893f8180ae508aaa5b21
+  checksum: b0531389635096ca3285ed1b9294ce5aea5f8ca66ba5c505f413321541066952
 - filename: src/components/TodoApp.js
   checksum: 847cbae3a0fd0b011b201b01871e423c4e6793e21a1131a10693e19830063ef6
 - filename: src/firebase/firebase.js
