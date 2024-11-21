@@ -3,6 +3,8 @@ fileignoreconfig:
   checksum: b0531389635096ca3285ed1b9294ce5aea5f8ca66ba5c505f413321541066952
 - filename: src/components/TodoApp.js
   checksum: 847cbae3a0fd0b011b201b01871e423c4e6793e21a1131a10693e19830063ef6
+- filename: src/components/TodoApp_firebase.js
+  checksum: 07cf136c63a60bdd587bfcb86dbfe777cd5ce878385a4bd7607152baa650109c
 - filename: src/firebase/firebase.js
   checksum: ef0353ac4b4079b8353c0dc8f1e0ed926f878445f8aa4c83e628e169833cd48e
 version: "1.0"

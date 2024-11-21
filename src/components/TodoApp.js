@@ -1,39 +1,72 @@
 import { useState, useEffect } from "react";
-import { db } from "../firebase/firebase";
-import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import "../styles/styles.css";
 
 const TodoApp = () => {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState("");
 
-  //fetch tasks from firestore
+  //fetch tasks from todo-backend app
   const fetchTasks = async () => {
-    const querySnapshot = await getDocs(collection(db, "tasks"));
-    const tasksList = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-    setTasks(tasksList);
+    try {
+      const response = await fetch("http://localhost:5000/tasks");
+      const tasks = await response.json();
+      setTasks(tasks);
+    } catch (error) {
+      console.error("Error fetching tasks from backend:", error);
+    }
   };
+
   // Add a new task
   const addTask = async () => {
     if (newTask.trim() === "") return;
-    await addDoc(collection(db, "tasks"), { text: newTask, completed: false });
-    setNewTask("");
-    fetchTasks();
+    try {
+      const response = await fetch("http://localhost:5000/tasks", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text: newTask, completed: false }),
+      });
+      if (response.ok) {
+        fetchTasks();
+        setNewTask("");
+      }
+    } catch (error) {
+      console.error("Error adding new task:", error);
+    }
   };
 
   // Delete a task
   const deleteTask = async (id) => {
-    await deleteDoc(doc(db, "tasks", id));
-    fetchTasks();
+    try {
+      const response = await fetch(`http://localhost:5000/tasks/${id}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        fetchTasks();
+      }
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
   };
 
   // Update a task (toggle completed)
   const toggleTask = async (id, completed) => {
-    await updateDoc(doc(db, "tasks", id), { completed: !completed });
-    fetchTasks();
+    try {
+      const response = await fetch(`http://localhost:5000/tasks/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ completed: !completed }),
+      });
+
+      if (response.ok) {
+        fetchTasks();
+      }
+    } catch (error) {
+      console.error("Error toggling task:", error);
+    }
   };
 
   useEffect(() => {
@@ -42,16 +75,29 @@ const TodoApp = () => {
 
   return (
     <div className="container">
-      <input type="text" value={newTask} onChange={(e) => setNewTask(e.target.value)} placeholder="New task" />
+      <input
+        type="text"
+        value={newTask}
+        onChange={(e) => setNewTask(e.target.value)}
+        placeholder="New task"
+      />
       <button onClick={addTask}>Add Task</button>
       <ul>
         {tasks.map((task) => (
           <li key={task.id}>
-            <span className={task.completed ? "completed" : ""}>{task.text}</span>
-            <button aria-label={`Mark task ${task.text} as ${task.completed ? "not completed" : "completed"}`} onClick={() => toggleTask(task.id, task.completed)}>
+            <span className={task.completed ? "completed" : ""}>
+              {task.text}
+            </span>
+            <button
+              aria-label={`Mark task ${task.text} as ${task.completed ? "not completed" : "completed"}`}
+              onClick={() => toggleTask(task.id, task.completed)}
+            >
               {task.completed ? "Undo" : "Complete"}
             </button>{" "}
-            <button aria-label={`Delete task ${task.text}`} onClick={() => deleteTask(task.id)}>
+            <button
+              aria-label={`Delete task ${task.text}`}
+              onClick={() => deleteTask(task.id)}
+            >
               Delete
             </button>
           </li>
